@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, make_response
+from flask_cors import CORS, cross_origin
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 import jwt
@@ -12,6 +13,9 @@ app.config[
 ] = "postgresql://apireservas:DSRbEehNCwZzUT0@top2.nearest.of.apireservas-db.internal:5432/apireservas"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "super-secret"
+
+# Configuracion de CORS para swagger
+cors = CORS(app)
 
 
 db = SQLAlchemy(app)
@@ -77,20 +81,21 @@ with app.app_context():
 
 def token_required(f):
     @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.args.get("token")
-
+    def decorated():
+        token = request.headers["Authorization"].split(' ')[1]
+        print(token)
         if not token:
             return jsonify({"message": "El token no existe"}), 401
         try:
-            data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=['HS256'])
+            jwt.decode(token, app.config["SECRET_KEY"], algorithms=['HS256'])
         except:
             return jsonify({"message": "El token ha expirado o es inválido"}), 401
-        return f(*args, **kwargs)
+        return f()
 
     return decorated
 
-
+# defino las rutas
+@cross_origin
 @app.route("/login", methods=["PUT"])
 def login():
     username = request.json["username"]
@@ -108,7 +113,7 @@ def login():
     return make_response("Usuario o contraseña incorrectos", 401)
 
 
-# defino las rutas
+@cross_origin
 @app.route("/materiales", methods=["PUT"])
 @token_required
 def get_materials():
@@ -122,6 +127,7 @@ def get_materials():
     return jsonify(MaterialSchema(many=True).dump(materials))
 
 
+@cross_origin
 @app.route("/reservar_materiales", methods=["PUT"])
 @token_required
 def reserve_materials():
