@@ -9,7 +9,7 @@ from functools import wraps
 app = Flask(__name__)
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = f"postgresql://grupo2:5XMC1oTou0vQwRYx4JSjQPLYLiN4h4Kb@dpg-cd88gopa6gds9o58r6ng-a.oregon-postgres.render.com/apireservas"
+] = f"postgresql://grupo2:5XMC1oTou0vQwRYx4JSjQPLYLiN4h4Kb@dpg-cd88gopa6gds9o58r6ng-a/apireservas"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "super-secret"
 
