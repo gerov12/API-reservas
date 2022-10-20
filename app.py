@@ -9,7 +9,7 @@ from functools import wraps
 app = Flask(__name__)
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = f"postgresql://grupo2:5XMC1oTou0vQwRYx4JSjQPLYLiN4h4Kb@dpg-cd88gopa6gds9o58r6ng-a.oregon-postgres.render.com/apireservas"
+] = "postgresql://apireservas:DSRbEehNCwZzUT0@top2.nearest.of.apireservas-db.internal:5432/apireservas"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "super-secret"
 
@@ -83,7 +83,7 @@ def token_required(f):
         if not token:
             return jsonify({"message": "El token no existe"}), 403
         try:
-            data = jwt.decode(token, app.config["SECRET_KEY"])
+            data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=['HS256'])
         except:
             return jsonify({"message": "El token ha expirado o es inválido"}), 403
         return f(*args, **kwargs)
@@ -100,11 +100,11 @@ def login():
         token = jwt.encode(
             {
                 "user": username,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30),
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
             },
             app.config["SECRET_KEY"],
         )
-        return jsonify({"token": token.decode("UTF-8")})
+        return jsonify({"token": token})
     return make_response("Usuario o contraseña incorrectos", 401)
 
 
