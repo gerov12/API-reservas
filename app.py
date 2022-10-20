@@ -81,17 +81,17 @@ def token_required(f):
         token = request.args.get("token")
 
         if not token:
-            return jsonify({"message": "El token no existe"}), 403
+            return jsonify({"message": "El token no existe"}), 401
         try:
             data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=['HS256'])
         except:
-            return jsonify({"message": "El token ha expirado o es inválido"}), 403
+            return jsonify({"message": "El token ha expirado o es inválido"}), 401
         return f(*args, **kwargs)
 
     return decorated
 
 
-@app.route("/login", methods=["GET"])
+@app.route("/login", methods=["PUT"])
 def login():
     username = request.json["username"]
     password = request.json["password"]
@@ -109,7 +109,7 @@ def login():
 
 
 # defino las rutas
-@app.route("/materiales", methods=["GET"])
+@app.route("/materiales", methods=["PUT"])
 @token_required
 def get_materials():
     names = request.json["names"]
