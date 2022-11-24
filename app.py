@@ -10,7 +10,7 @@ from functools import wraps
 app = Flask(__name__)
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = "postgresql://apireservas:DSRbEehNCwZzUT0@top2.nearest.of.apireservas-db.internal:5432/apireservas"
+] = "mysql+pymysql://grupo41:123456@localhost:3306/apireservas"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "super-secret"
 
@@ -82,17 +82,18 @@ with app.app_context():
 def token_required(f):
     @wraps(f)
     def decorated():
-        token = request.headers["Authorization"].split(' ')[1]
+        token = request.headers["Authorization"].split(" ")[1]
         print(token)
         if not token:
             return jsonify({"message": "El token no existe"}), 401
         try:
-            jwt.decode(token, app.config["SECRET_KEY"], algorithms=['HS256'])
+            jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
         except:
             return jsonify({"message": "El token ha expirado o es inválido"}), 401
         return f()
 
     return decorated
+
 
 # defino las rutas
 @cross_origin
@@ -105,7 +106,7 @@ def login():
         token = jwt.encode(
             {
                 "user": username,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=40),
             },
             app.config["SECRET_KEY"],
         )
