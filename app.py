@@ -10,7 +10,7 @@ from functools import wraps
 app = Flask(__name__)
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = "postgresql://postgres:48ad6b4f1d71013f854ca765c9b25f4cc2ba58042545497b@localhost:6543/apireservas"
+] = "mysql+pymysql://grupo41:123456@localhost:3306/apireservas"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "super-secret"
 
@@ -45,7 +45,7 @@ class MaterialSchema(ma.Schema):
 # PEDIDO
 class Pedido(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer)
     colection_id = db.Column(db.Integer)
     material_id = db.Column(db.Integer, db.ForeignKey("material.id"))
     quantity = db.Column(db.Integer)
@@ -67,7 +67,6 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50))
     password = db.Column(db.String(50))
-    pedido = db.relationship("Pedido", backref="user", uselist=False)
 
     def __init__(self, id, username, password):
         self.id = id
